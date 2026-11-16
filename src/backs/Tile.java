@@ -1,11 +1,12 @@
 package backs;
 
+import backs.pieces.EmptyPiece;
+
 public class Tile {
     private Piece piece;
     private Color color;
     // Stores combination of indexes of this tile in "board" array
     private final Pair pair;
-    private Pair enPassantTarget = null;
 
     // Constructor setting values of all attributes
     public Tile(Piece piece, Color color, Pair pair) {
@@ -51,7 +52,7 @@ public class Tile {
     public boolean pieceColorEquals(Tile tile) {
         boolean answer;
 
-        if (tile.getPiece() == null || piece == null) {
+        if (tile.isEmpty() || isEmpty()) {
             answer = false;
         } else if (tile.getPiece().getColor() != piece.getColor()){
             answer = false;
@@ -68,18 +69,11 @@ public class Tile {
         return pair.equals(tile.getPair());
     }
 
-    // Exempts Piece attribute
-    public void clear() {this.piece = null;}
+    /* Exempts Piece attribute. Empty tile holds EmptyPiece, not null:
+    *  roadClear() and pawn moves look for EmptyPiece, so a null left
+    *  after a move used to block the road like a real piece
+    */
+    public void clear() {this.piece = new EmptyPiece();}
 
-    public void setEnPassantTarget(Pair pair) {
-        this.enPassantTarget = pair;
-    }
-
-    public Pair getEnPassantTarget() {
-        return this.enPassantTarget;
-    }
-
-    public boolean isEnPassant() {
-        return (this.enPassantTarget != null);
-    }
+    public boolean isEmpty() {return piece instanceof EmptyPiece;}
 }

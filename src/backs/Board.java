@@ -63,7 +63,8 @@ public class Board {
     public void sortByColor(Tile tile) {
         Piece piece = tile.getPiece();
         
-        if (piece != null) {
+        // Empty tiles belong to nobody
+        if (!(piece instanceof EmptyPiece)) {
             if (piece.getColor() == Color.WHITE) {
                 whites.add(tile);
             } else {
@@ -104,7 +105,7 @@ public class Board {
         Piece toPiece = to.getPiece();
         fromPiece.firstMoveDone();
 
-        if (toPiece != null) {
+        if (!(toPiece instanceof EmptyPiece)) {
             TileSet toArr = getTileSet(toPiece.getColor());
             int toIndex = toArr.indexOf(to);
 
@@ -124,12 +125,14 @@ public class Board {
         transfer(fromTile, toTile);
     }
 
+    /* Takes back transfer(). First move flag of the piece is restored
+    *  by caller: only it knows, whether the piece had moved before
+    */
     public void antiTransfer(Tile from, Tile to, 
             Piece toPiece, int toIndex) {
         Piece fromPiece = to.getPiece();
-        fromPiece.firstMoveUndone();
 
-        if (toPiece != null) {
+        if (!(toPiece instanceof EmptyPiece)) {
             TileSet toArr = getTileSet(toPiece.getColor());
             toArr.add(toIndex, to);
         }
@@ -146,6 +149,21 @@ public class Board {
         Tile fromTile = getTileByPair(from);
         Tile toTile = getTileByPair(to);
         antiTransfer(fromTile, toTile, toPiece, toIndex);
+    }
+
+    // Takes piece off the board (en passant), returns its index in TileSet
+    public int remove(Tile tile) {
+        TileSet arr = getTileSet(tile.getPiece().getColor());
+        int index = arr.indexOf(tile);
+        arr.erase(index);
+        tile.clear();
+        return index;
+    }
+
+    // Puts back piece taken by remove()
+    public void restore(Tile tile, Piece piece, int index) {
+        tile.setPiece(piece);
+        getTileSet(piece.getColor()).add(index, tile);
     }
 
     public boolean roadClear(Pair from, Pair to) {

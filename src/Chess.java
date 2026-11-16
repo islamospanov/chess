@@ -11,8 +11,11 @@ public class Chess {
 
         while (game.notEnd()) {
         	Pair[] move = in.formattedInput();
+        	if (move == null) {
+        		return;
+        	}
             try {
-                game.move(move[0], move[1]);
+                game.move(move[0], move[1], in.getPromotion());
                 out.print();
             } catch(WrongMoveExeption ex) {
                 System.out.println(ex);

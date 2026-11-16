@@ -9,6 +9,8 @@ import backs.*;
 public class Reader {
 	private InputStreamReader isr = new InputStreamReader(System.in);
 	private BufferedReader reader = new BufferedReader(isr);
+	// Piece a pawn turns into on the last row: Q, R, B or K (knight)
+	private char promotion = 'Q';
 	
     private Pair[] format(String input) {
 		StringTokenizer tokenizer;
@@ -28,20 +30,28 @@ public class Reader {
     }
 
     private boolean accepted(String input) {
-        return input.matches("[A-H][1-8]-[A-H][1-8]");
+        return input.matches("[A-H][1-8]-[A-H][1-8][QRBK]?");
     }
 
+    // Returns null when input is over (Ctrl+D or end of file)
     public Pair[] formattedInput() {
-		String input = "empty input";
+		String input;
     	try {
-    		while (!accepted(input = reader.readLine())) {
-    			System.out.println("input format MUST be 'A1-H8'");
+    		while ((input = reader.readLine()) != null) {
+    			input = input.trim().toUpperCase();
+    			if (accepted(input)) {
+    				promotion = (input.length() == 6) ? input.charAt(5) : 'Q';
+    				return format(input);
+    			}
+    			System.out.println("input format MUST be 'A1-H8' (pawn promotion: 'A7-A8Q', 'A7-A8K' for knight)");
     		}
     	} catch (IOException e) {
 			e.printStackTrace();
 		}
-        return format(input);
+        return null;
     }
+
+    public char getPromotion() {return promotion;}
     
     public void closeRrader() {
     	try {
